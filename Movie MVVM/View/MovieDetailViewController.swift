@@ -13,6 +13,7 @@ class MovieDetailViewController: UIViewController {
     fileprivate let model = MovieDetailViewModel()
     var movieId: String?
     @IBOutlet weak var bottomView: UIView!
+    @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var lblTitle: UILabel!
     @IBOutlet weak var lblYear: UILabel!
@@ -30,7 +31,18 @@ class MovieDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        initVM()
+    }
+    
+    private func initVM() {
         model.delegate = self
+        model.showAlert = { [weak self] in
+            DispatchQueue.main.async {
+                if let message = self?.model.alertMessage {
+                    self?.showAlert(message)
+                }
+            }
+        }
     }
     
     private func setupUI() {
@@ -57,8 +69,7 @@ class MovieDetailViewController: UIViewController {
                 self?.stackViewGenre.addArrangedSubview(label)
             }
 
-            self?.imageView.kf.setImage(with: URL(string: self?.model.movie?.poster ?? ""))
-//            self?.imageView.load(urlString: self?.model.movie?.poster ?? "")
+            self?.imageView.kf.setImage(with: URL(string: self?.model.movie?.poster ?? ""), placeholder: UIImage(named: "icon-placeholder"))
             self?.lblYear.text = self?.model.movie?.year
             self?.lblDuration.text = "\(duration.hours)h " + "\(duration.leftMinutes)min"
             self?.lblRated.text = self?.model.movie?.rated
@@ -79,6 +90,12 @@ class MovieDetailViewController: UIViewController {
             self?.lblActor.text = "Actors: " + (self?.model.movie?.actors ?? "")
             
         }
+    }
+    
+    private func showAlert( _ message: String ) {
+        let alert = UIAlertController(title: "Alert", message: message, preferredStyle: .alert)
+        alert.addAction( UIAlertAction(title: "Ok", style: .cancel, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {

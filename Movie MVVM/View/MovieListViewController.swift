@@ -29,15 +29,29 @@ class MovieListViewController: UIViewController {
         cvMovie.dataSource = self
         cvMovie.delegate = self
         cvMovie.register(UINib.init(nibName: "MovieCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: reuseIdentifier)
-        model.delegate = self
         setupUI()
-        
+        initVM()
+    }
+    
+    private func initVM() {
+        model.delegate = self
+        model.showAlert = { [weak self] in
+            DispatchQueue.main.async {
+                if let message = self?.model.alertMessage {
+                    self?.showAlert(message)
+                }
+            }
+        }
+    }
+    
+    private func showAlert( _ message: String ) {
+        let alert = UIAlertController(title: "Alert", message: message, preferredStyle: .alert)
+        alert.addAction( UIAlertAction(title: "Ok", style: .cancel, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
     private func setupUI() {
         navigationItem.backButtonTitle = ""
-
-        
         guard let collectionView = cvMovie, let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
 
         flowLayout.minimumInteritemSpacing = margin
@@ -48,7 +62,6 @@ class MovieListViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-//        model.retrieveMovie(title: textFieldSearch.text ?? "")
     }
 }
 
@@ -69,7 +82,6 @@ extension MovieListViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        return model.movie?.search?.count ?? 0
         return privateList.count
     }
     
@@ -108,18 +120,6 @@ extension MovieListViewController: UICollectionViewDelegateFlowLayout {
 
         return CGSize(width: size, height: size)
     }
-    
-//    func collectionView(_ collectionView: UICollectionView,
-//                        layout collectionViewLayout: UICollectionViewLayout,
-//                        insetForSectionAt section: Int) -> UIEdgeInsets {
-//      return sectionInsets
-//    }
-//
-//    func collectionView(_ collectionView: UICollectionView,
-//                        layout collectionViewLayout: UICollectionViewLayout,
-//                        minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-//      return sectionInsets.left
-//    }
 }
 
 extension MovieListViewController: UITextFieldDelegate {

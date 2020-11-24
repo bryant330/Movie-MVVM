@@ -14,15 +14,24 @@ protocol MovieListViewModelProtocol {
 
 class MovieListViewModel: NSObject {
     var delegate: MovieListViewModelProtocol?
+    let apiService: APIServiceProtocol
+    var alertMessage: String? {
+        didSet {
+            self.showAlert?()
+        }
+    }
+    var showAlert: (()->())?
     
     fileprivate(set) var movie: MovieSearchModel?
     
-    private var service = APIService()
+    init(apiService: APIServiceProtocol = APIService()) {
+        self.apiService = apiService
+    }
     
     func retrieveMovie(title: String, page: Int) {
-        service.getMovieList(title: title, page: page) { (movieResult, error) in
+        apiService.getMovieList(title: title, page: page) { (success, movieResult, error) in
             if let error = error {
-                print(error)
+                self.alertMessage = error.localizedDescription
             } else {
                 if let result = movieResult {
 //                    self.movie?.search?.append(result.search)

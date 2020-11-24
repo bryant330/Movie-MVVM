@@ -25,14 +25,11 @@ class MovieCollectionViewCell: UICollectionViewCell {
         //always fill the view
         blurEffectView.frame = self.bottomView.bounds
         blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-
-//        bottomView.addSubview(blurEffectView)
         bottomView.insertSubview(blurEffectView, belowSubview: lblYear)
     }
     
     public func configure(with model: MovieModel?) {
-        imageView.kf.setImage(with: URL(string: model?.poster ?? ""))
-//        imageView.load(urlString: model?.poster ?? "")
+        imageView.kf.setImage(with: URL(string: model?.poster ?? ""), placeholder: UIImage(named: "icon-placeholder"))
         lblYear.text = model?.year ?? ""
         lblTitle.text = model?.title ?? ""
     }
